@@ -33,4 +33,34 @@ class BookController extends Controller
 
         return new BookResource($book);
     }
+
+    public function store(Request $request)
+    {
+        $book = DB::transaction(function () use ($request) {
+            $book = Book::create([
+                'user_id' => $request->input('user_id'),
+                'title' => $request->input('title'),
+                'author' => $request->input('author'),
+                'isbn' => $request->input('isbn'),
+                'published_date' => $request->input('published_date'),
+                'description' => $request->input('description'),
+                'image_url' => $request->input('image_url'),
+            ]);
+
+            $genreIds = $request->input('genres', []);
+
+            $book->genres()->sync($genreIds);
+
+            $book->load('genres');
+
+            return $book;
+        });
+
+        $book->loadAvg('reviews', 'rating');
+        $book->loadCount('reviews');
+
+        return (new BookResource($book))
+            ->response()
+            ->setStatusCode(201);
+    }
 }
