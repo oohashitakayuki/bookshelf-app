@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\BookResource;
 use App\Models\Book;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
@@ -18,5 +19,18 @@ class BookController extends Controller
             ->paginate(20);
 
         return BookResource::collection($books);
+    }
+
+    public function show(Book $book)
+    {
+        $book->load([
+            'genres',
+            'reviews.user',
+        ]);
+
+        $book->loadAvg('reviews', 'rating');
+        $book->loadCount('reviews');
+
+        return new BookResource($book);
     }
 }
