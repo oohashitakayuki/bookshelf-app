@@ -23,6 +23,7 @@ Route::middleware('auth')->group(function () {
   Route::post('/books/{book}/reviews',[ReviewController::class, 'store'])->name('reviews.store');
   Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
   Route::post('/books/{book}/favorites', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
+  Route::post('/reviews/{review}/like', [ReviewLikeController::class, 'toggle'])->name('reviews.like');
 });
 
 Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
