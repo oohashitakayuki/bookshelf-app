@@ -22,6 +22,7 @@ Route::middleware('auth')->group(function () {
   Route::delete('/genres/{genre}', [GenreController::class, 'destroy'])->name('genres.destroy');
   Route::post('/books/{book}/reviews',[ReviewController::class, 'store'])->name('reviews.store');
   Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
+  Route::post('/books/{book}/favorites', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
 });
 
 Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
