@@ -13,6 +13,8 @@ Route::get('/', [BookController::class, 'index'])->name('books.index');
 Route::middleware('auth')->group(function () {
   Route::get('/books/create', [BookController::class, 'create'])->name('books.create');
   Route::post('/books', [BookController::class, 'store'])->name('books.store');
+  Route::get('/books/{book}/edit', [BookController::class, 'edit'])->name('books.edit');
+  Route::put('/books/{book}', [BookController::class, 'update'])->name('books.update');
   Route::get('/genres', [GenreController::class, 'index'])->name('genres.index');
   Route::get('/genres/create', [GenreController::class, 'create'])->name('genres.create');
   Route::post('/genres', [GenreController::class, 'store'])->name('genres.store');
