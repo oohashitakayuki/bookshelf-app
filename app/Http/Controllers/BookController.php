@@ -58,4 +58,39 @@ class BookController extends Controller
             ->route('books.show', $book)
             ->with('success', '書籍を登録しました。');
     }
+
+    public function edit(Book $book)
+    {
+        $this->authorize('update', $book);
+
+        $book->load('genres');
+
+        $genres = Genre::orderBy('id')->get();
+
+        return view('books.edit', compact('book', 'genres'));
+    }
+
+    public function update(Request $request, Book $book)
+    {
+        $this->authorize('update', $book);
+
+        DB::transaction(function () use ($request, $book) {
+            $book->update([
+                'title' => $request->input('title'),
+                'author' => $request->input('author'),
+                'isbn' => $request->input('isbn'),
+                'published_date' => $request->input('published_date'),
+                'description' => $request->input('description'),
+                'image_url' => $request->input('image_url'),
+            ]);
+
+            $genreIds = $request->input('genres', []);
+
+            $book->genres()->sync($genreIds);
+        });
+
+        return redirect()
+            ->route('books.show', $book)
+            ->with('success', '書籍を更新しました。');
+    }
 }
