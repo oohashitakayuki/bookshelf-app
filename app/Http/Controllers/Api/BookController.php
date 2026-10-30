@@ -63,4 +63,28 @@ class BookController extends Controller
             ->response()
             ->setStatusCode(201);
     }
+
+    public function update(Request $request, Book $book)
+    {
+        DB::transaction(function () use ($request, $book) {
+            $book->update([
+                'title' => $request->input('title'),
+                'author' => $request->input('author'),
+                'isbn' => $request->input('isbn'),
+                'published_date' => $request->input('published_date'),
+                'description' => $request->input('description'),
+                'image_url' => $request->input('image_url'),
+            ]);
+
+            $genreIds = $request->input('genres', []);
+
+            $book->genres()->sync($genreIds);
+        });
+
+        $book->load('genres');
+        $book->loadAvg('reviews', 'rating');
+        $book->loadCount('reviews');
+
+        return new BookResource($book);
+    }
 }
