@@ -15,6 +15,7 @@ Route::middleware('auth')->group(function () {
   Route::post('/books', [BookController::class, 'store'])->name('books.store');
   Route::get('/books/{book}/edit', [BookController::class, 'edit'])->name('books.edit');
   Route::put('/books/{book}', [BookController::class, 'update'])->name('books.update');
+  Route::delete('/books/{book}', [BookController::class, 'destroy'])->name('books.destroy');
   Route::get('/genres', [GenreController::class, 'index'])->name('genres.index');
   Route::get('/genres/create', [GenreController::class, 'create'])->name('genres.create');
   Route::post('/genres', [GenreController::class, 'store'])->name('genres.store');
