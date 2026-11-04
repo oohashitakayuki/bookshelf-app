@@ -93,4 +93,32 @@ class BookController extends Controller
             ->route('books.show', $book)
             ->with('success', '書籍を更新しました。');
     }
+
+    public function destroy(Book $book)
+    {
+        $this->authorize('delete', $book);
+
+        DB::transaction(function () use ($book) {
+            $reviewIds = $book->reviews()
+                ->pluck('id');
+
+            DB::table('review_like')
+                ->whereIn('review_id', $reviewIds)
+                ->delete();
+
+            $book->reviews()->delete();
+
+            DB::table('favorites')
+                ->where('book_id', $book->id)
+                ->delete();
+
+            $book->genres()->detach();
+
+            $book->delete();
+        });
+
+        return redirect()
+            ->route('books.index')
+            ->with('success', '書籍を削除しました。');
+    }
 }
