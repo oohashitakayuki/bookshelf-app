@@ -87,4 +87,27 @@ class BookController extends Controller
 
         return new BookResource($book);
     }
+
+    public function destroy(Book $book)
+    {
+        DB::transaction(function () use ($book) {
+            $reviewIds = $book->reviews()->pluck('id');
+
+            DB::table('review_like')
+                ->whereIn('review_id', $reviewIds)
+                ->delete();
+
+            $book->reviews()->delete();
+
+            DB::table('favorites')
+                ->where('book_id', $book->id)
+                ->delete();
+
+            $book->genres()->detach();
+
+            $book->delete();
+        });
+
+        return response()->noContent();
+    }
 }
