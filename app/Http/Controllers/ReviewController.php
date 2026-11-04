@@ -42,4 +42,19 @@ class ReviewController extends Controller
             ->route('books.show', $review->book)
             ->with('success', 'レビューを更新しました。');
     }
+
+    public function destroy(Review $review)
+    {
+        $this->authorize('delete', $review);
+
+        $book = $review->book;
+
+        $review->likedByUsers()->detach();
+
+        $review->delete();
+
+        return redirect()
+            ->route('books.show', $book)
+            ->with('success', 'レビューを削除しました。');
+    }
 }
