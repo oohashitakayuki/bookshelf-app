@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreGenreRequest;
+use App\Http\Requests\UpdateGenreRequest;
 use App\Models\Genre;
 use Illuminate\Http\Request;
 
@@ -17,23 +19,7 @@ class GenreController extends Controller
         return view('genres.index', compact('genres'));
     }
 
-    public function create()
-    {
-        return view('genres.create');
-    }
-
-    public function store(Request $request)
-    {
-        $genre = Genre::create([
-            'name' => $request->input('name'),
-        ]);
-
-        return redirect()
-            ->route('genres.index')
-            ->with('success', 'ジャンルを作成しました。');
-    }
-
-    public function show(Genre $genre)
+        public function show(Genre $genre)
     {
         $books = $genre->books()
             ->with('genres')
@@ -44,15 +30,31 @@ class GenreController extends Controller
         return view('genres.show', compact('genre', 'books'));
     }
 
+    public function create()
+    {
+        return view('genres.create');
+    }
+
+    public function store(StoreGenreRequest $request)
+    {
+        Genre::create(
+            $request->validated()
+        );
+
+        return redirect()
+            ->route('genres.index')
+            ->with('success', 'ジャンルを作成しました。');
+    }
+
     public function edit(Genre $genre)
     {
         return view('genres.edit', compact('genre'));
     }
 
-    public function update(Request $request, Genre $genre)
+    public function update(UpdateGenreRequest $request, Genre $genre)
     {
         $genre->update([
-            'name' => $request->input('name'),
+            'name' => $request->validated()['name'],
         ]);
 
         return redirect()
@@ -65,7 +67,7 @@ class GenreController extends Controller
         if ($genre->books()->exists()) {
             return redirect()
                 ->route('genres.index')
-                ->with('error', '書籍が紐付いているジャンルは削除できません。');
+                ->with('error', 'このジャンルには書籍が紐付いているため削除できません。');
         }
 
         $genre->delete();
