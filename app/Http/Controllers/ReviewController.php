@@ -2,19 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreReviewRequest;
+use App\Http\Requests\UpdateReviewRequest;
 use App\Models\Book;
 use App\Models\Review;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
-    public function store(Request $request, Book $book)
+    public function store(StoreReviewRequest $request, Book $book)
     {
+        $validated = $request->validated();
+
         Review::create([
             'user_id' => $request->user()->id,
             'book_id' => $book->id,
-            'rating' => $request->input('rating'),
-            'comment' => $request->input('comment'),
+            'rating' => $validated['rating'],
+            'comment' => $validated['comment'],
         ]);
 
         return redirect()
@@ -29,13 +33,15 @@ class ReviewController extends Controller
         return view('reviews.edit', compact('review'));
     }
 
-    public function update(Request $request, Review $review)
+    public function update(UpdateReviewRequest $request, Review $review)
     {
         $this->authorize('update', $review);
 
+        $validated = $request->validated();
+
         $review->update([
-            'rating' => $request->input('rating'),
-            'comment' => $request->input('comment'),
+            'rating' => $validated['rating'],
+            'comment' => $validated['comment'] ?? null,
         ]);
 
         return redirect()
