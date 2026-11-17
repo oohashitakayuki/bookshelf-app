@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\BookIndexRequest;
+use App\Http\Requests\Api\StoreBookRequest;
+use App\Http\Requests\Api\UpdateBookRequest;
 use App\Http\Resources\BookResource;
 use App\Models\Book;
 use Illuminate\Http\Request;
@@ -10,13 +13,38 @@ use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
-    public function index(Request $request)
+    public function index(BookIndexRequest $request)
     {
-        $books = Book::with('genres')
+        $validated = $request->validated();
+
+        $query = Book::with('genres')
             ->withAvg('reviews', 'rating')
-            ->withCount('reviews')
-            ->latest()
-            ->paginate(20);
+            ->withCount('reviews');
+
+        if (!empty($validated['keyword'])) {
+            $keyword = $validated['keyword'];
+
+            $query->where(function ($q) use ($keyword) {
+                $q->where('title', 'like', "%{$keyword}%")
+                    ->orWhere('author', 'like', "%{$keyword}%");
+            });
+        }
+
+        if (!empty($validated['genre'])) {
+            $genreId = $validated['genre'];
+
+            $query->whereHas('genres', function ($q) use ($genreId) {
+                $q->where('genres.id', $genreId);
+            });
+        }
+
+        $query->latest();
+
+        $perPage = $validated['per_page'] ?? 10;
+
+        $books = $query
+            ->paginate($perPage)
+            ->withQueryString();
 
         return BookResource::collection($books);
     }
@@ -34,20 +62,23 @@ class BookController extends Controller
         return new BookResource($book);
     }
 
-    public function store(Request $request)
+    public function store(StoreBookRequest $request)
     {
-        $book = DB::transaction(function () use ($request) {
+        $validated = $request->validated();
+
+        $book = DB::transaction(function () use ($validated) {
+
             $book = Book::create([
-                'user_id' => $request->input('user_id'),
-                'title' => $request->input('title'),
-                'author' => $request->input('author'),
-                'isbn' => $request->input('isbn'),
-                'published_date' => $request->input('published_date'),
-                'description' => $request->input('description'),
-                'image_url' => $request->input('image_url'),
+                'user_id' => $validated['user_id'],
+                'title' => $validated['title'],
+                'author' => $validated['author'],
+                'isbn' => $validated['isbn'],
+                'published_date' => $validated['published_date'],
+                'description' => $validated['description'] ?? null,
+                'image_url' => $validated['image_url'] ?? null,
             ]);
 
-            $genreIds = $request->input('genres', []);
+            $genreIds = $validated['genres'];
 
             $book->genres()->sync($genreIds);
 
@@ -64,19 +95,22 @@ class BookController extends Controller
             ->setStatusCode(201);
     }
 
-    public function update(Request $request, Book $book)
+    public function update(UpdateBookRequest $request, Book $book)
     {
-        DB::transaction(function () use ($request, $book) {
+        $validated = $request->validated();
+
+        DB::transaction(function () use ($validated, $book) {
+
             $book->update([
-                'title' => $request->input('title'),
-                'author' => $request->input('author'),
-                'isbn' => $request->input('isbn'),
-                'published_date' => $request->input('published_date'),
-                'description' => $request->input('description'),
-                'image_url' => $request->input('image_url'),
+                'title' => $validated['title'],
+                'author' => $validated['author'],
+                'isbn' => $validated['isbn'],
+                'published_date' => $validated['published_date'],
+                'description' => $validated['description'] ?? null,
+                'image_url' => $validated['image_url'] ?? null,
             ]);
 
-            $genreIds = $request->input('genres', []);
+            $genreIds = $validated['genres'];
 
             $book->genres()->sync($genreIds);
         });
