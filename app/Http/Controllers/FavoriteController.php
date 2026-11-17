@@ -22,6 +22,6 @@ class FavoriteController extends Controller
     {
         auth()->user()->favoriteBooks()->toggle($book->id);
 
-        return direct()->back();
+        return back();
     }
 }
