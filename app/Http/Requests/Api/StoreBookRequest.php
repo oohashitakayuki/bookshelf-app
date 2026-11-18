@@ -50,7 +50,7 @@ class StoreBookRequest extends FormRequest
             'isbn.unique' => 'このISBNは既に登録されています。',
             'published_date.required' => '出版日は必須です。',
             'published_date.date' => '有効な出版日を入力してください。',
-            'description.max' =>'説明は255文字以内で入力してください。',
+            'description.max' => '説明は255文字以内で入力してください。',
             'image_url.url' => '画像URLは正しいURL形式で入力してください。',
             'image_url.max' => '画像URLは255文字以内で入力してください。',
             'genres.required' => 'ジャンルを1つ以上選択してください。',
