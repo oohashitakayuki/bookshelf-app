@@ -8,7 +8,6 @@ use App\Http\Requests\Api\StoreBookRequest;
 use App\Http\Requests\Api\UpdateBookRequest;
 use App\Http\Resources\BookResource;
 use App\Models\Book;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
@@ -21,7 +20,7 @@ class BookController extends Controller
             ->withAvg('reviews', 'rating')
             ->withCount('reviews');
 
-        if (!empty($validated['keyword'])) {
+        if (! empty($validated['keyword'])) {
             $keyword = $validated['keyword'];
 
             $query->where(function ($q) use ($keyword) {
@@ -30,7 +29,7 @@ class BookController extends Controller
             });
         }
 
-        if (!empty($validated['genre'])) {
+        if (! empty($validated['genre'])) {
             $genreId = $validated['genre'];
 
             $query->whereHas('genres', function ($q) use ($genreId) {

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Review;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 
 class ReviewLikeController extends Controller
 {
@@ -14,7 +13,7 @@ class ReviewLikeController extends Controller
 
         $result = $user->likedReviews()->toggle($review->id);
 
-        if (!empty($result['attached'])) {
+        if (! empty($result['attached'])) {
             return back()->with('success', 'レビューにいいねしました。');
         }
 
