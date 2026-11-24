@@ -19,12 +19,13 @@ git clone https://github.com/oohashitakayuki/bookshelf-app.git
 
 ## APIエンドポイント一覧
 
-| HTTPメソッド | URI                   | 説明　                     |
-| GET　       | /api/v1/books         | 書籍一覧を取得する           |
-| GET　       | /api/v1/books/{book}  | 指定した書籍の詳細を取得する　 |
-| POST　      | /api/v1/books         | 書籍を新規登録する           |
-| PUT　       | /api/v1/books/{book}  | 指定した書籍を更新する　      |
-| DELETE　    | /api/v1/books/{book}  | 指定した書籍を削除する　      |
+| HTTPメソッド | URI | 説明 |
+| :--- | :--- |:--- |
+| GET | /api/v1/books | 書籍一覧を取得する |
+| GET | /api/v1/books/{book} | 指定した書籍の詳細を取得する |
+| POST | /api/v1/books | 書籍を新規登録する |
+| PUT | /api/v1/books/{book} | 指定した書籍を更新する |
+| DELETE | /api/v1/books/{book} | 指定した書籍を削除する |
 
 ## ER図
 
